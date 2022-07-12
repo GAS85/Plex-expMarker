@@ -1,3 +1,3 @@
 # Plex-expMarker
 
-This is s script to automatically mark Series with expiration time
+This is a script to automatically mark Series with expiration time. 
