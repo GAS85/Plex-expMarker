@@ -4,9 +4,9 @@
 
 # Plex URL
 PlexDomain="https://192.168.0.9"
-# Plex Port if different from standart
-PlexPort="32400"
-# If using https with a selfsigned Certifikate - enable Cerificate ignoring
+# Plex Port if different from standard
+PlexPort=32400
+# If using https with a self-signed Certificate - enable Certificate ignoring
 IgnoreCertificate=false
 # Plex Token
 PlexToken="xxxxxxxxxxxxx"
@@ -16,11 +16,8 @@ PlexToken="xxxxxxxxxxxxx"
 #  1   - one day
 #  7   - one Week
 #  100 - Remove with a next Scan
-# Other values could be experemental
+# Other values could be experimental
 keepDays=7
-
-# If Series Section is different from default
-PlexSections=2
 
 ### END OF CONFIGURATION ###
 
@@ -97,10 +94,10 @@ PlexURL=$PlexDomain:$PlexPort
 connectivityCheck="$(curl $curlConnectivityConfiguration "%{http_code}\n" "$PlexURL/library/sections/$PlexSections/all?type=2&X-Plex-Token=$PlexToken" -o /dev/null)"
 [[ "$connectivityCheck" == "401" ]] && { echo "$(date) - ERROR - Unauthorized. Please check Client Token."; exit 1; }
 [[ "$connectivityCheck" == "404" ]] && { echo "$(date) - ERROR - Plex Section not found. Please check configuration."; exit 1; }
-[[ "$connectivityCheck" == "500" ]] && { echo "$(date) - WARNING - Server Error. Can't work."; exit 1; }
-[[ "$connectivityCheck" == "000" ]] && { echo "$(date) - ERROR - Host not reachable under $PlexURL. Please check if Server and Port are correct."; exit 1; }
+[[ "$connectivityCheck" == "500" ]] && { echo "$(date) - WARNING - Plex Server Error. Can't work."; exit 1; }
+[[ "$connectivityCheck" == "000" ]] && { echo "$(date) - ERROR - Plex not reachable under $PlexURL. Please check if Server and Port are correct."; exit 1; }
 
-echo "$(date) - INFO - Successfully connected to Host under $PlexURL."
+echo "$(date) - INFO - Successfully connected to Plex under $PlexURL."
 
 getAllSeries () {
 
@@ -135,8 +132,8 @@ setNewCurrentDeletePolicy () {
 	apiCallSetPolicy="$(curl $curlConnectivityConfiguration "%{http_code}\n" -X PUT "$PlexURL/library/metadata/$getCurrentId/prefs?autoDeletionItemPolicyWatchedLibrary=$keepDays&X-Plex-Token=$PlexToken" -o /dev/null)"
 	[[ "$apiCallSetPolicy" == "401" ]] && { echo "$(date) - ERROR - Unauthorized. Please check Client Token."; exit 1; }
 	[[ "$apiCallSetPolicy" == "404" ]] && { echo "$(date) - ERROR - $getCurrentTitle with ID $getCurrentId not found."; exit 1; }
-	[[ "$apiCallSetPolicy" == "500" ]] && { echo "$(date) - ERROR - Server error."; exit 1; }
-	[[ "$apiCallSetPolicy" == "000" ]] && { echo "$(date) - ERROR - Host not reachable under $PlexURL."; exit 1; }
+	[[ "$apiCallSetPolicy" == "500" ]] && { echo "$(date) - ERROR - Plex Server error."; exit 1; }
+	[[ "$apiCallSetPolicy" == "000" ]] && { echo "$(date) - ERROR - Plex not reachable under $PlexURL."; exit 1; }
 
 }
 
