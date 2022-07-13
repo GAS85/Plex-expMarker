@@ -19,9 +19,12 @@ PlexToken="xxxxxxxxxxxxx"
 # Other values could be experimental
 keepDays=7
 
+# Plex Section, if different from default
+PlexSections=2
+
 ### END OF CONFIGURATION ###
 
-while getopts ":hk:s" option; do
+while getopts ":hk:sd" option; do
 	case $option in
 		h)	# Help
 			echo "Simple Script for Plex that will massively manage Series Autodelete Policy."
@@ -46,6 +49,7 @@ while getopts ":hk:s" option; do
                   100 - delete with a next Scan.
                   Other values could be experimental"
 			echo "  -s              Show current active configuration and exit."
+            echo "  -d              Dry run, show output, but not change anything."
 			echo "  -h              This help."
 			exit 0
 			;;
@@ -59,6 +63,9 @@ while getopts ":hk:s" option; do
 			echo "Policy to keep Series: $keepDays"
 			echo "Ignore Certificate:    $IgnoreCertificate"
 			exit 0
+			;;
+		d)	# enable dryrun
+			dryRun=true
 			;;
 		\?)
 			break
@@ -87,6 +94,8 @@ if [[ -z "$keepDays" ]] || [[ "$keepDays" -le 0 ]] || [[ "$keepDays" -ge 100 ]] 
 	exit 1
 
 fi
+
+[[ "$dryRun" == true ]] && { echo "$(date) - INFO - Dry Run, will not change anything, only show output with possible changes."; }
 
 PlexURL=$PlexDomain:$PlexPort
 
@@ -154,7 +163,7 @@ do
 
 		if [[ "$getCurrentAutoDeletePolicy" -ne "null" ]]; then
 
-			setNewCurrentDeletePolicy
+			[[ "$dryRun" == true ]] || setNewCurrentDeletePolicy
 
 			echo "$(date) - INFO - $getCurrentTitle with ID $getCurrentId found. Auto Delete Policy set to $keepDays day(s)."
 
