@@ -24,12 +24,72 @@ PlexSections=2
 
 ### END OF CONFIGURATION ###
 
-#if [[ -z "$keepDays" ]] || [[ "$keepDays" == 0 ]]; then
+while getopts ":hk:s" option; do
+	case $option in
+		h)	# Help
+			echo "Simple Script for Plex that will massively manage Series Autodelete Policy."
+			echo "By Georgiy Sitnikov."
+			echo ""
+			echo "Usage: ./plex-set-series-expiration-time.sh [options]"
+            echo ""
+			echo "Example:"
+            echo "To keep all Series forever:"
+			echo "  ./plex-set-series-expiration-time.sh -k 0"
+            echo ""
+            echo "... autodelete after seen in a 1 week"
+			echo "  ./plex-set-series-expiration-time.sh -k 7"
+            echo ""
+			echo "Options:"
+			echo "  -k <Number>     Set Number of days to keep messages, all messages older than
+                  this number will be deleted. Default 7.
+                  Possible Values are:
+                  0 - do not automatically delete,
+                  1 - delete after 1 day,
+                  7 - delete after 1 week,
+                  100 - delete with a next Scan.
+                  Other values could be experimental"
+			echo "  -s              Show current active configuration and exit."
+			echo "  -h              This help."
+			exit 0
+			;;
+		k)	# set keepDays
+			keepDays="$OPTARG"
+			;;
+		s)	# Show current Active Configuration
+			echo "Plex Domain:           $PlexDomain"
+			echo "Plex Port:             $PlexPort"
+			echo "Plex Token:            $(echo $PlexToken | cut -c -4)..."
+			echo "Policy to keep Series: $keepDays"
+			echo "Ignore Certificate:    $IgnoreCertificate"
+			exit 0
+			;;
+		\?)
+			break
+			;;
+	esac
+done
 
-#	echo "Keep Days is not set or Zero, nothing to do."
-#	exit 1
+# Set curl Options, like timeout and number of retries
+if [[ "$IgnoreCertificate" == true ]]; then
 
-#fi
+	curlConfiguration="-fsk -m 5 --retry 2"
+	curlPutConfiguration="-k -m 5 --retry 2"
+	curlConnectivityConfiguration="-k -m 5 -sL -w"
+
+else
+
+	curlConfiguration="-fs -m 5 --retry 2"
+	curlPutConfiguration="-m 5 --retry 2"
+	curlConnectivityConfiguration="-m 5 -sL -w"
+
+fi
+
+if [[ -z "$keepDays" ]] || [[ "$keepDays" -le 0 ]] || [[ "$keepDays" -ge 100 ]] ; then
+
+	echo "$(date) - ERROR - Keep days is seems not to be valid. Current value is: $keepDays, allowed is from 0 to 100."
+	exit 1
+
+fi
 
 PlexURL=$PlexDomain:$PlexPort
 
@@ -38,7 +98,7 @@ connectivityCheck="$(curl $curlConnectivityConfiguration "%{http_code}\n" "$Plex
 [[ "$connectivityCheck" == "401" ]] && { echo "$(date) - ERROR - Unauthorized. Please check Client Token."; exit 1; }
 [[ "$connectivityCheck" == "404" ]] && { echo "$(date) - ERROR - Plex Section not found. Please check configuration."; exit 1; }
 [[ "$connectivityCheck" == "500" ]] && { echo "$(date) - WARNING - Server Error. Can't work."; exit 1; }
-[[ "$connectivityCheck" == "000" ]] && { echo "$(date) - ERROR - Host not reacheble under $PlexURL. Please check if Server and Port are correct."; exit 1; }
+[[ "$connectivityCheck" == "000" ]] && { echo "$(date) - ERROR - Host not reachable under $PlexURL. Please check if Server and Port are correct."; exit 1; }
 
 echo "$(date) - INFO - Successfully connected to Host under $PlexURL."
 
@@ -76,7 +136,7 @@ setNewCurrentDeletePolicy () {
 	[[ "$apiCallSetPolicy" == "401" ]] && { echo "$(date) - ERROR - Unauthorized. Please check Client Token."; exit 1; }
 	[[ "$apiCallSetPolicy" == "404" ]] && { echo "$(date) - ERROR - $getCurrentTitle with ID $getCurrentId not found."; exit 1; }
 	[[ "$apiCallSetPolicy" == "500" ]] && { echo "$(date) - ERROR - Server error."; exit 1; }
-	[[ "$apiCallSetPolicy" == "000" ]] && { echo "$(date) - ERROR - Host not reacheble under $PlexURL."; exit 1; }
+	[[ "$apiCallSetPolicy" == "000" ]] && { echo "$(date) - ERROR - Host not reachable under $PlexURL."; exit 1; }
 
 }
 
