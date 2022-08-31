@@ -118,9 +118,9 @@ getAllSeries () {
 
 	getAutoDeletePolicy="$(echo $apiCall | jq .MediaContainer.Metadata | grep '"autoDeletionItemPolicyWatchedLibrary"' | grep -v $keepDays | wc -l)"
 
-	echo "$(date) - INFO - Found $getAutoDeletePolicy items to work with from $getItemsNumber items at all."
+	echo "$(date) - INFO - Found $(expr $getAutoDeletePolicy + $getItemsNumber - $getAutoDeletePolicyAll) items to work with from $getItemsNumber items at all."
 
-	[[ "$getAutoDeletePolicy" == "0" ]] && { echo "$(date) - INFO - Nothing to do."; exit 0; }
+	[[ "$getAutoDeletePolicy" == "0" && "$getAutoDeletePolicyAll" == "$getItemsNumber" ]] && { echo "$(date) - INFO - Nothing to do."; exit 0; }
 
 }
 
@@ -161,7 +161,7 @@ do
 
 	else
 
-		if [[ "$getCurrentAutoDeletePolicy" -ne "null" ]]; then
+		if [[ "$getCurrentTitle" != "null" ]]; then
 
 			[[ "$dryRun" == true ]] || setNewCurrentDeletePolicy
 
