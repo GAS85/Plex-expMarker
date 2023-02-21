@@ -114,9 +114,11 @@ getAllSeries () {
 	apiCall="$(curl $curlConfiguration "$PlexURL/library/sections/$PlexSections/all?type=2&X-Plex-Token=$PlexToken" -H "Accept: application/json, text/plain, */*" 2>/dev/null)"
 
 	# Outpuput Number
-	getItemsNumber="$(echo $apiCall | jq '.MediaContainer.size')"
+	getItemsNumber="$(echo $apiCall | jq .MediaContainer.size)"
 
 	getAutoDeletePolicy="$(echo $apiCall | jq .MediaContainer.Metadata | grep '"autoDeletionItemPolicyWatchedLibrary"' | grep -v $keepDays | wc -l)"
+
+	getAutoDeletePolicyAll="$(echo $apiCall | jq .MediaContainer.Metadata | grep '"autoDeletionItemPolicyWatchedLibrary"' | wc -l)"
 
 	echo "$(date) - INFO - Found $(expr $getAutoDeletePolicy + $getItemsNumber - $getAutoDeletePolicyAll) items to work with from $getItemsNumber items at all."
 
@@ -126,11 +128,11 @@ getAllSeries () {
 
 checkCurrentDeletePolicy () {
 
-	getCurrentAutoDeletePolicy="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'] .autoDeletionItemPolicyWatchedLibrary' | sed 's/"//g')"
+	getCurrentAutoDeletePolicy="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'].autoDeletionItemPolicyWatchedLibrary' | sed 's/"//g')"
 	# Output Example: 7
-	getCurrentId="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'] .ratingKey' | sed 's/"//g')"
+	getCurrentId="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'].ratingKey' | sed 's/"//g')"
 	# Output Example: 6379
-	getCurrentTitle="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'] .title')"
+	getCurrentTitle="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'].title')"
 	# Output Example: "Some Series"
 
 }
