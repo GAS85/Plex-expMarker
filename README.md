@@ -17,8 +17,7 @@ Other values could be experimental.
 
 Use `-h` for help, `-d` for dry run or `-s` to see current configuration.
 
-- `PlexDomain="https://192.168.0.9"` Plex URL,
-- `PlexPort="32400"` Plex Port if different from standard,
+- `PlexURL="https://192.168.0.9:32400"` Plex URL with Port and Protocol,
 - `IgnoreCertificate=false` If using https with a self-signed Certificate - enable Certificate ignoring,
 - `PlexToken="xxxxxxxxxxxxx"` Plex Token.
 
@@ -44,7 +43,7 @@ Mi 13. Jul 10:39:41 CEST 2022 - INFO - Finished.
 ### Direct run
 
 ```shell
-./plex-set-series-expiration-time.sh -k 7
+./plex-set-series-expiration-time.sh -u https://192.168.0.9:32400 -i -t xyzxyz-xyz -k 7
 Mi 13. Jul 10:39:39 CEST 2022 - INFO - Successfully connected to Host under https://192.168.0.9:32400.
 Mi 13. Jul 10:39:39 CEST 2022 - INFO - Found 5 items to work with from 17 items at all.
 Mi 13. Jul 10:39:39 CEST 2022 - INFO - "Vikings" with ID 6023 found. Auto Delete Policy set to 7 day(s).
