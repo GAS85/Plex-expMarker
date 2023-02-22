@@ -2,16 +2,20 @@
 
 Wondering how to [Auto-delete watched episodes series](https://forums.plex.tv/t/change-delete-episodes-after-watching-default-behaviour/199807)?
 This is a script to automatically mark **all** Series with expiration time.
-You need to set Plex URL, Plex Port and [Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
+You need to set:
+ - Protocol (http or https),
+ - Plex URL,
+ - Plex Port ([usually 32400](https://support.plex.tv/articles/201543147-what-network-ports-do-i-need-to-allow-through-my-firewall/)),
+ - [Plex Token](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/).
 
 ## Configuration
 
 You can set how long plex will save your Series after you watch it via config `keepDays` value, or as parameter e.g. `-k 7`. Possible values are:
 
-- 0 - keep forever, no autodelete at all
+- 0 - keep forever, **no** autodelete at all
 - 1 - one day
 - 7 - one Week
-- 100 - Remove with a next Scan
+- 100 - Remove with a next Scan (cloud be less than 1 day)
 
 Other values could be experimental.
 

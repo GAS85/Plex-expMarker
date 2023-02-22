@@ -101,6 +101,7 @@ else
 
 fi
 
+# Check if keep Days between 0 and 100 to set correct value
 if [[ -z "$keepDays" ]] || [[ "$keepDays" -le 0 ]] || [[ "$keepDays" -ge 100 ]] ; then
 
 	echo "$(date) - ERROR - Keep days is seems not to be valid. Current value is: $keepDays, allowed is from 0 to 100."
@@ -133,10 +134,12 @@ getAllSeries () {
 
 	echo "$(date) - INFO - Found $(expr $getAutoDeletePolicy + $getItemsNumber - $getAutoDeletePolicyAll) items to work with from $getItemsNumber items at all."
 
+	# Will continue if there is ether no policy set or it is partly set
 	[[ "$getAutoDeletePolicy" == "0" && "$getAutoDeletePolicyAll" == "$getItemsNumber" ]] && { echo "$(date) - INFO - Nothing to do."; exit 0; }
 
 }
 
+# Will get Current Policy, Series ID and Title
 checkCurrentDeletePolicy () {
 
 	getCurrentAutoDeletePolicy="$(echo $apiCall | jq '.MediaContainer.Metadata['$COUNT'].autoDeletionItemPolicyWatchedLibrary' | sed 's/"//g')"
@@ -148,6 +151,7 @@ checkCurrentDeletePolicy () {
 
 }
 
+# Will set new expiration policy
 setNewCurrentDeletePolicy () {
 
 	apiCallSetPolicy="$(curl $curlConnectivityConfiguration "%{http_code}\n" -X PUT "$PlexURL/library/metadata/$getCurrentId/prefs?autoDeletionItemPolicyWatchedLibrary=$keepDays&X-Plex-Token=$PlexToken" -o /dev/null)"
